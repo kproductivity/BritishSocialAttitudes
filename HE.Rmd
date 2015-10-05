@@ -1,0 +1,86 @@
+---
+title: "British Social Attitudes - Population Segmentation"
+author: "Francisco Marco-Serrano"
+date: "05 October 2015"
+output: pdf_document
+---
+
+Attitudinal population segmentation is a research project into the British society regarding attitudes to several societal topics, including Higher Education, with the aim of segmenting population beyond the typical income-based measures and relationship or sociological perspectives.
+
+#Data
+
+Data is from the British Social Attitudes Survey 2013, obtained from the UK Data Service.
+
+> NatCen Social Research, British Social Attitudes Survey, 2013 [computer file]. Colchester, Essex: UK Data Archive [distributor], July 2014. SN: 7500, http://dx.doi.org/10.5255/UKDA-SN-7500-1
+
+
+```{r}
+setwd("~/British Social Attitudes 2013")
+bas13 <- read.delim("bsa13ukds.tab", header = TRUE, sep = "\t")
+bas13 <- bas13[, -c(1:3)]
+
+#Housekeeping for random forest
+
+
+```
+
+Questionnaire can be found at [http://doc.ukdataservice.ac.uk/doc/7500/mrdoc/pdf/bsa2013_capi_final_questionnaire.pdf].
+
+Questions about Higher Education are:
+
+Q375. HEFee - I'm now going to ask you what you think about university or college
+students or their families paying towards the costs of their
+tuition, either while they are studying or after they have
+finished. Which of the views on this card comes closest to what
+you think about that?
+
+Q376. FeesUni - Which of the following statements comes closest to your own view?
+
+Q377. FeesSub - And which of these two statements comes closest to your own view?
+
+Q378. HEGrant2 - And, at present, some full-time British university students get
+grants to help cover their living costs. Getting a grant depends
+upon the student's circumstances and those of their family. Do you
+think that...?
+
+Q379. Himp - And how important do you think it is for a young person to go on to
+higher education - to a university or college?
+
+Q380. HEFtPt - In general, do you think that young people studying for higher education qualifications at universities and colleges should study full-time for three or four years or do you think they should study part-time while working, taking longer to complete their courses?
+
+```{r, echo=FALSE}
+library(randomForest)
+
+set.seed(123)
+fit.rf <- randomForest(Himp~., data=bas13)
+
+# Show Top 10 variables in importance
+importance <- round(importance(fit.rf), 2)
+importance[order(importance, decreasing=T),][1:10]
+
+
+```
+
+The main characteristics determining the answer to question Q379 are (ordered in descending importance):
+
+Q384. HEspkfl - How important do you think it is for UK students to be able to speak a foreign language?
+
+Q618. RaceOri3 - To which of these groups do you consider you belong?
+
+Q899. RPrivEd - Attends/ed fee-paying, private primary or secondary school in UK.
+
+Q900. OthChld3 - Have you ever been responsible for bringing up any children of
+school age, including stepchildren?
+
+Q543. FamPT - Combining full-time work and family brings more problems than
+benefits.
+
+Q380. HEFtPt - In general, do you think that young people studying for higher education qualifications at universities and colleges should study full-time for three or four years or do you think they should study part-time while working, taking longer to complete their courses?
+
+Q849. LIFESAT - All things considered, how satisfied are you with your life as a whole nowadays? 
+
+Q495. SSrJbTim - Are you full/part-time? [if selfemp]
+
+Q478. REmploye - Respondent currently employee or self-employed
+
+Q446. NucSub - At the moment Britain's nuclear weapon submarines are based in Scotland. Regardless of whether you support or oppose Britain having nuclear weapons, if Scotland became an independent country, separate from the rest of the UK, should Britain's nuclear weapons remain in Scotland or should they be moved to somewhere else in Britain?
