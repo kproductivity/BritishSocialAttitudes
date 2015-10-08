@@ -88,12 +88,21 @@ confusionMatrix(data = predict.rf, bas13.test$Himp)
 The main characteristics determining the answer to question Q379 are (ordered in descending importance):
 
 *UniFibet - University attender will end up better off financially
+
 *EdSpnd1c - Highest priority for extra government spending on education?
+
 *UniDebts - University cost leads to debt he/she can't afford to repay
+
 *ChLikUn2 - How likely that any of your children who are still at school will go to university?
+
 *PTPay - Who should pay the largest share of tuition fees for those studying part-time
+
 *Statsec2 - State secondary schools nowadays teach young people basic skills such as reading, writing and maths
+
 *PrimImp2 - Second most useful one for improving the education of children in primary schools
+
 *PTFee - Which part time students should get financial support from government?
+
 *InStuCu - International students from outside the EU bring with them significant cultural benefits to Britain.
+
 *NHSPri1 - Most important area of NHS work.
