@@ -2,7 +2,7 @@
 title: "British Social Attitudes - Population Segmentation"
 author: "Francisco Marco-Serrano"
 date: "08 October 2015"
-output: pdf_document
+output: html_document
 ---
 
 Attitudinal population segmentation is a research project into the British society regarding attitudes to several societal topics, including Higher Education, with the aim of segmenting population beyond the typical income-based measures and relationship or sociological perspectives.
@@ -21,39 +21,31 @@ setwd("~/British Social Attitudes 2013")
 bas13 <- read.delim("bsa13ukds.tab", header = TRUE, sep = "\t")
 
 #Housekeeping for machine learning
+# keep only cat 1 to 4
+bas13 <- bas13[ which(bas13$Himp>0 & bas13$Himp<5), ]
 bas13$Himp <- as.factor(bas13$Himp)
 
 
 set.seed(123)
-inTraining <- createDataPartition(bas13$Serial, p = .7, list = FALSE)
-bas13.train <- bas13[inTraining, -c(1:3)]
-bas13.test <- bas13[-inTraining, -c(1:3)]
+inTraining <- createDataPartition(bas13$Serial, p = .75, list = FALSE)
+
+#variables to exclude
+#todo: exclude variable to be used to imputate
+exclude <- c(1:99)
+
+bas13.train <- bas13[inTraining, -exclude]
+bas13.test <- bas13[-inTraining, -exclude]
 
 ```
 
 Questionnaire can be found at http://doc.ukdataservice.ac.uk/doc/7500/mrdoc/pdf/bsa2013_capi_final_questionnaire.pdf
 
-Questions about Higher Education are:
+Metadata can be found at http://nesstar.esds.ac.uk/webview/
 
-Q375. HEFee - I'm now going to ask you what you think about university or college
-students or their families paying towards the costs of their
-tuition, either while they are studying or after they have
-finished. Which of the views on this card comes closest to what
-you think about that?
 
-Q376. FeesUni - Which of the following statements comes closest to your own view?
+#Analysis
 
-Q377. FeesSub - And which of these two statements comes closest to your own view?
-
-Q378. HEGrant2 - And, at present, some full-time British university students get
-grants to help cover their living costs. Getting a grant depends
-upon the student's circumstances and those of their family. Do you
-think that...?
-
-Q379. Himp - And how important do you think it is for a young person to go on to
-higher education - to a university or college?
-
-Q380. HEFtPt - In general, do you think that young people studying for higher education qualifications at universities and colleges should study full-time for three or four years or do you think they should study part-time while working, taking longer to complete their courses?
+Variable to explain is 'Himp': How important it is for a young person to go on to a university or college?
 
 ```{r, echo=FALSE}
 library(randomForest)
@@ -87,22 +79,16 @@ confusionMatrix(data = predict.rf, bas13.test$Himp)
 
 The main characteristics determining the answer to question Q379 are (ordered in descending importance):
 
-*UniFibet - University attender will end up better off financially
+* UniFibet - University attender will end up better off financially
+* EdSpnd1c - Highest priority for extra government spending on education?
+* UniDebts - University cost leads to debt he/she can't afford to repay
+* ChLikUn2 - How likely that any of your children who are still at school will go to university?
+* PTPay - Who should pay the largest share of tuition fees for those studying part-time
+* Statsec2 - State secondary schools nowadays teach young people basic skills such as reading, writing and maths
+* PrimImp2 - Second most useful one for improving the education of children in primary schools
+* PTFee - Which part time students should get financial support from government?
+* InStuCu - International students from outside the EU bring with them significant cultural benefits to Britain.
+* NHSPri1 - Most important area of NHS work.
 
-*EdSpnd1c - Highest priority for extra government spending on education?
 
-*UniDebts - University cost leads to debt he/she can't afford to repay
-
-*ChLikUn2 - How likely that any of your children who are still at school will go to university?
-
-*PTPay - Who should pay the largest share of tuition fees for those studying part-time
-
-*Statsec2 - State secondary schools nowadays teach young people basic skills such as reading, writing and maths
-
-*PrimImp2 - Second most useful one for improving the education of children in primary schools
-
-*PTFee - Which part time students should get financial support from government?
-
-*InStuCu - International students from outside the EU bring with them significant cultural benefits to Britain.
-
-*NHSPri1 - Most important area of NHS work.
+For imputation purposes, questions Q809-841 & 880-895 (National Identity), Q849 (life satisfaction), 896-897 (disability), 899-973 (education), 1041-1051 (income).
